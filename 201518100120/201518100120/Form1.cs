@@ -12,6 +12,7 @@ using ESRI.ArcGIS.DataSourcesFile;
 using ESRI.ArcGIS.DataSourcesRaster;
 using ESRI.ArcGIS.Display;
 using ESRI.ArcGIS.Geodatabase;
+using ESRI.ArcGIS.esriSystem;
 
 namespace _201518100120
 {
@@ -231,10 +232,7 @@ namespace _201518100120
             mapDocument.Close();
         }
 
-        private void axMapControl1_OnMouseMove(object sender, IMapControlEvents2_OnMouseMoveEvent e)
-        {
-
-        }
+        
 
         private void 添加书签ToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -279,6 +277,65 @@ namespace _201518100120
             frm.ShowDialog();
         }
         private string sMapUnit = "未知单位";//地图单位变量
+
+        private string GetMapUnit(esriUnits esriUnit)
+        {
+            string MapUnit = "";
+            switch(esriUnit)
+            {
+                case esriUnits.esriCentimeters:
+                    MapUnit="厘米";
+                    break;
+                case esriUnits.esriDecimalDegrees:
+                    MapUnit = "十进制";
+                    break;
+                case esriUnits.esriDecimeters:
+                    MapUnit = "分米";
+                    break;
+                case esriUnits.esriFeet:
+                    MapUnit = "尺";
+                    break;
+                case esriUnits.esriInches:
+                    MapUnit = "英尺";
+                    break;
+                case esriUnits.esriKilometers:
+                    MapUnit = "千米";
+                    break;
+                case esriUnits.esriMeters:
+                    MapUnit = "米";
+                    break;
+                case esriUnits.esriMiles:
+                    MapUnit = "英里";
+                    break;
+                case esriUnits.esriMillimeters:
+                    MapUnit = "毫米";
+                    break;
+                case esriUnits.esriNauticalMiles:
+                    MapUnit = "海里";
+                    break;
+                case esriUnits.esriPoints:
+                    MapUnit = "点";
+                    break;
+                case esriUnits.esriYards:
+                    MapUnit = "码";
+                    break;
+                case esriUnits.esriUnknownUnits:
+                    MapUnit = "未知单位";
+                    break;
+              }
+            return MapUnit;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void axMapControl1_OnMouseMove(object sender, IMapControlEvents2_OnMouseMoveEvent e)
+        {
+            sMapUnit = GetMapUnit(axMapControl1.Map.MapUnits);
+            barCoorTxt.Text = string.Format("当前坐标：X{0:#.###}  Y={1:#.###}{2}",e.mapX,e.mapY,sMapUnit);
+        }
 
     }
 }

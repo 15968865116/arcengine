@@ -51,7 +51,7 @@ namespace _201518100120
             this.axTOCControl1 = new ESRI.ArcGIS.Controls.AxTOCControl();
             this.axMapControl1 = new ESRI.ArcGIS.Controls.AxMapControl();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.barCoorTxt = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axTOCControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.axMapControl1)).BeginInit();
@@ -200,14 +200,14 @@ namespace _201518100120
             // 添加书签ToolStripMenuItem
             // 
             this.添加书签ToolStripMenuItem.Name = "添加书签ToolStripMenuItem";
-            this.添加书签ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.添加书签ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.添加书签ToolStripMenuItem.Text = "添加书签";
             this.添加书签ToolStripMenuItem.Click += new System.EventHandler(this.添加书签ToolStripMenuItem_Click);
             // 
             // 书签管理ToolStripMenuItem
             // 
             this.书签管理ToolStripMenuItem.Name = "书签管理ToolStripMenuItem";
-            this.书签管理ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.书签管理ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.书签管理ToolStripMenuItem.Text = "书签管理";
             this.书签管理ToolStripMenuItem.Click += new System.EventHandler(this.书签管理ToolStripMenuItem_Click);
             // 
@@ -232,18 +232,18 @@ namespace _201518100120
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel1});
+            this.barCoorTxt});
             this.statusStrip1.Location = new System.Drawing.Point(0, 461);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(762, 22);
             this.statusStrip1.TabIndex = 3;
             this.statusStrip1.Text = "statusStrip1";
             // 
-            // toolStripStatusLabel1
+            // barCoorTxt
             // 
-            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(131, 17);
-            this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
+            this.barCoorTxt.Name = "barCoorTxt";
+            this.barCoorTxt.Size = new System.Drawing.Size(131, 17);
+            this.barCoorTxt.Text = "toolStripStatusLabel1";
             // 
             // Form1
             // 
@@ -257,6 +257,7 @@ namespace _201518100120
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axTOCControl1)).EndInit();
@@ -292,7 +293,7 @@ namespace _201518100120
         private System.Windows.Forms.ToolStripMenuItem 添加书签ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 书签管理ToolStripMenuItem;
         private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.ToolStripStatusLabel barCoorTxt;
     }
 }
 
