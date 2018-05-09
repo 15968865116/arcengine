@@ -1,0 +1,28 @@
+c:\users\admin\documents\visual studio 2010\Projects\201518100120\201518100120\obj\x86\Debug\ResolveAssemblyReference.cache
+c:\users\admin\documents\visual studio 2010\Projects\201518100120\201518100120\obj\x86\Debug\_201518100120.Form1.resources
+c:\users\admin\documents\visual studio 2010\Projects\201518100120\201518100120\obj\x86\Debug\_201518100120.Properties.Resources.resources
+c:\users\admin\documents\visual studio 2010\Projects\201518100120\201518100120\obj\x86\Debug\GenerateResource.read.1.tlog
+c:\users\admin\documents\visual studio 2010\Projects\201518100120\201518100120\obj\x86\Debug\GenerateResource.write.1.tlog
+c:\users\admin\documents\visual studio 2010\Projects\201518100120\201518100120\bin\Debug\201518100120.exe
+c:\users\admin\documents\visual studio 2010\Projects\201518100120\201518100120\bin\Debug\201518100120.pdb
+c:\users\admin\documents\visual studio 2010\Projects\201518100120\201518100120\obj\x86\Debug\201518100120.exe
+c:\users\admin\documents\visual studio 2010\Projects\201518100120\201518100120\obj\x86\Debug\201518100120.pdb
+E:\arcengine\201518100120\201518100120\obj\x86\Debug\201518100120.exe
+E:\arcengine\201518100120\201518100120\obj\x86\Debug\201518100120.pdb
+E:\arcengine\201518100120\201518100120\bin\Debug\201518100120.exe
+E:\arcengine\201518100120\201518100120\bin\Debug\201518100120.pdb
+E:\arcengine\201518100120\201518100120\obj\x86\Debug\ResolveAssemblyReference.cache
+E:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.Form1.resources
+E:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.Properties.Resources.resources
+E:\arcengine\201518100120\201518100120\obj\x86\Debug\GenerateResource.read.1.tlog
+E:\arcengine\201518100120\201518100120\obj\x86\Debug\GenerateResource.write.1.tlog
+I:\arcengine\201518100120\201518100120\obj\x86\Debug\201518100120.exe
+I:\arcengine\201518100120\201518100120\obj\x86\Debug\201518100120.pdb
+I:\arcengine\201518100120\201518100120\bin\Debug\201518100120.exe
+I:\arcengine\201518100120\201518100120\bin\Debug\201518100120.pdb
+I:\arcengine\201518100120\201518100120\obj\x86\Debug\201518100120.csprojResolveAssemblyReference.cache
+I:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.Form1.resources
+I:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.Properties.Resources.resources
+I:\arcengine\201518100120\201518100120\obj\x86\Debug\201518100120.csproj.GenerateResource.Cache
+E:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.bookmark.resources
+E:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.managebookmark.resources
