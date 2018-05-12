@@ -48,6 +48,8 @@ namespace _201518100120
             this.书签ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.添加书签ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.书签管理ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.量测ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.距离量测ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.axTOCControl1 = new ESRI.ArcGIS.Controls.AxTOCControl();
             this.axMapControl1 = new ESRI.ArcGIS.Controls.AxMapControl();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -64,7 +66,8 @@ namespace _201518100120
             this.打开文件ToolStripMenuItem,
             this.地图浏览ToolStripMenuItem,
             this.地图文档保存ToolStripMenuItem,
-            this.书签ToolStripMenuItem});
+            this.书签ToolStripMenuItem,
+            this.量测ToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(762, 25);
@@ -211,6 +214,21 @@ namespace _201518100120
             this.书签管理ToolStripMenuItem.Text = "书签管理";
             this.书签管理ToolStripMenuItem.Click += new System.EventHandler(this.书签管理ToolStripMenuItem_Click);
             // 
+            // 量测ToolStripMenuItem
+            // 
+            this.量测ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.距离量测ToolStripMenuItem});
+            this.量测ToolStripMenuItem.Name = "量测ToolStripMenuItem";
+            this.量测ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
+            this.量测ToolStripMenuItem.Text = "量测";
+            // 
+            // 距离量测ToolStripMenuItem
+            // 
+            this.距离量测ToolStripMenuItem.Name = "距离量测ToolStripMenuItem";
+            this.距离量测ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.距离量测ToolStripMenuItem.Text = "距离量测";
+            this.距离量测ToolStripMenuItem.Click += new System.EventHandler(this.距离量测ToolStripMenuItem_Click);
+            // 
             // axTOCControl1
             // 
             this.axTOCControl1.Location = new System.Drawing.Point(0, 37);
@@ -228,6 +246,7 @@ namespace _201518100120
             this.axMapControl1.TabIndex = 0;
             this.axMapControl1.OnMouseDown += new ESRI.ArcGIS.Controls.IMapControlEvents2_Ax_OnMouseDownEventHandler(this.axMapControl1_OnMouseDown);
             this.axMapControl1.OnMouseMove += new ESRI.ArcGIS.Controls.IMapControlEvents2_Ax_OnMouseMoveEventHandler(this.axMapControl1_OnMouseMove);
+            this.axMapControl1.OnDoubleClick += new ESRI.ArcGIS.Controls.IMapControlEvents2_Ax_OnDoubleClickEventHandler(this.axMapControl1_OnDoubleClick);
             // 
             // statusStrip1
             // 
@@ -294,6 +313,8 @@ namespace _201518100120
         private System.Windows.Forms.ToolStripMenuItem 书签管理ToolStripMenuItem;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel barCoorTxt;
+        private System.Windows.Forms.ToolStripMenuItem 量测ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 距离量测ToolStripMenuItem;
     }
 }
 

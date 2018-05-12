@@ -22,6 +22,19 @@ namespace _201518100120
         {
             InitializeComponent();
         }
+        //量测全局变量
+        private measureresult frmMeasureresult;//量算结果窗体
+        private bool bMeasureArea;//是否开始面积量算功能
+        private bool bMeasureLength;//是否开始长度量算
+        private INewLineFeedback pNewLineFeedback;//追踪线对象
+        private INewPolygonFeedback pNewPolygonFeedback;//追踪面对象
+        private IPoint pPointPt=new PointClass();//鼠标点击点
+        private IPoint pMovePt=new PointClass();//鼠标移动当前点 
+        private double dToltaLength;//量测总长度
+        private double dSegmentLength;//片段距离
+        private IPointCollection pAreaPointCollection =new MultipointClass();//面积量算时画的点进行存储
+        string mousedownname = "";//鼠标按下操作的全局变量
+
 
         private void 打开地图文档ToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -75,7 +88,7 @@ namespace _201518100120
 
         }
 
-        private void 上一个视图ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void 上一个视图ToolStripMenuItem_Click(object sender, EventArgs e)//到上一个视图
         {
             
             IExtentStack pExtentStack = axMapControl1.ActiveView.ExtentStack;
@@ -95,7 +108,7 @@ namespace _201518100120
             axMapControl1.ActiveView.Refresh();
         }
 
-        private void 放大ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void 放大ToolStripMenuItem_Click(object sender, EventArgs e)//放大
         {
             IEnvelope pEnvelope = axMapControl1.Extent;
             pEnvelope.Expand(0.5,0.5,true);
@@ -110,8 +123,10 @@ namespace _201518100120
             axMapControl1.Extent = pEnvelope;
             axMapControl1.ActiveView.Refresh();
         }
-        string mousedownname = "";
-        private void 拉框放大ToolStripMenuItem_Click(object sender, EventArgs e)
+       
+        
+
+        private void 拉框放大ToolStripMenuItem_Click(object sender, EventArgs e)//拉框放大
         {
             mousedownname = "zoomin";
             
@@ -122,6 +137,7 @@ namespace _201518100120
         {
             IActiveView pActiveview = axMapControl1.ActiveView;
             IEnvelope envelope = new EnvelopeClass();
+                   
 
             switch(mousedownname)
             { 
@@ -148,6 +164,21 @@ namespace _201518100120
                     break;
                 case "manyou":
                     axMapControl1.Pan();
+                    break;
+                case "MeasureLength":
+                    pPointPt.PutCoords(e.mapX, e.mapY);
+                    if (pNewLineFeedback == null)
+                    {
+                        pNewLineFeedback = new NewLineFeedback { Display = pActiveview.ScreenDisplay };//实例化追踪线对象
+                        pNewLineFeedback.Start(pPointPt);//设置起点，开始动态绘制
+                        dToltaLength = 0;
+                    }
+                    else//如果追踪线对象不为空，则添加当前鼠标点
+                    {
+                        pNewLineFeedback.AddPoint(pPointPt);
+                    }
+                    if (dSegmentLength != 0)
+                        dToltaLength = dToltaLength + dSegmentLength;
                     break;
 
             }
@@ -331,11 +362,92 @@ namespace _201518100120
 
         }
 
-        private void axMapControl1_OnMouseMove(object sender, IMapControlEvents2_OnMouseMoveEvent e)
+        private void axMapControl1_OnMouseMove(object sender, IMapControlEvents2_OnMouseMoveEvent e)//左下角鼠标坐标显示
         {
             sMapUnit = GetMapUnit(axMapControl1.Map.MapUnits);
             barCoorTxt.Text = string.Format("当前坐标：X{0:#.###}  Y={1:#.###}{2}",e.mapX,e.mapY,sMapUnit);
+            pMovePt.PutCoords(e.mapX, e.mapY);//获取移动点
+            switch (mousedownname)
+            {
+                case "MeasureLength":
+                    if (pNewLineFeedback != null)
+                        pNewLineFeedback.MoveTo(pMovePt);//移动至当前
+                    if (pPointPt != null && pNewLineFeedback != null)
+                    {
+                        double deltaX = pMovePt.X - pPointPt.X;//两点间X差
+                        double deltaY = pMovePt.Y - pPointPt.Y;//两点间Y 差
+                        dSegmentLength = Math.Round(Math.Sqrt(deltaX * deltaX + deltaY * deltaY), 3);
+                        dToltaLength = dToltaLength + dSegmentLength;
+                        if (frmMeasureresult != null)
+                        {
+                            frmMeasureresult.label2.Text=String.Format("当前长度线段为：{0:.###}{1};\r\n总长度为：{2:.###}{1}",dSegmentLength,sMapUnit,dToltaLength);
+                            dToltaLength = dToltaLength - dSegmentLength;//鼠标移动到新点重新开始计算
+                        }
+                    }
+
+                    break;
+            }
         }
+
+        private void frmMeasureResult_frmClosed()//委托函数所调用的事件，主要用于结束量算和清空线和面对象
+        {
+            if (pNewLineFeedback != null)//判断面对象是否为空不为空则清空
+            {
+                pNewLineFeedback.Stop();
+                pNewLineFeedback = null;
+            }
+            if (pNewPolygonFeedback != null)//清空面对象
+            {
+                pNewPolygonFeedback.Stop();
+                pNewPolygonFeedback = null;
+                pAreaPointCollection.RemovePoints(0,pAreaPointCollection.PointCount);//清空点集中所有点
+            }
+            axMapControl1.ActiveView.PartialRefresh(esriViewDrawPhase.esriViewForeground,null,null);//清空量算画的线、面对象
+            axMapControl1.MousePointer = esriControlsMousePointer.esriPointerDefault;//结束量算功能
+ 
+        }
+
+        private void 距离量测ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            axMapControl1.CurrentTool = null;
+            mousedownname = "MeasureLength";//给后续鼠标参数传递参数
+            axMapControl1.MousePointer = esriControlsMousePointer.esriPointerCrosshair;//改变鼠标形状
+            if (frmMeasureresult == null || frmMeasureresult.IsDisposed)//窗口不存在则新建一个窗口
+            {
+                frmMeasureresult = new measureresult();
+                frmMeasureresult.frmClose += frmMeasureResult_frmClosed;//委托事件就是后面的函数
+                frmMeasureresult.Show();
+            }
+            else
+            {
+                frmMeasureresult.Activate();//激活存在的窗口
+            }
+
+        }
+
+        private void axMapControl1_OnDoubleClick(object sender, IMapControlEvents2_OnDoubleClickEvent e)
+        {
+            switch(mousedownname)
+            {
+                case "MeasureLength":
+                    if(frmMeasureresult!=null)
+                    {
+                        frmMeasureresult.label2.Text = "线段总长度为："+dToltaLength+sMapUnit;
+                    }
+                    if (pNewLineFeedback != null)
+                    {
+                        pNewLineFeedback.Stop();
+                        pNewLineFeedback = null;
+                        //清空线对象
+                        axMapControl1.ActiveView.PartialRefresh(esriViewDrawPhase.esriViewForeground,null,null);
+                    }
+                    dToltaLength = 0;
+                    dSegmentLength = 0;
+                    break;
+            }
+        }
+
+
 
     }
 }
