@@ -50,14 +50,19 @@ namespace _201518100120
             this.书签管理ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.量测ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.距离量测ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.axTOCControl1 = new ESRI.ArcGIS.Controls.AxTOCControl();
-            this.axMapControl1 = new ESRI.ArcGIS.Controls.AxMapControl();
+            this.面积量测ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.barCoorTxt = new System.Windows.Forms.ToolStripStatusLabel();
+            this.要素选择操作ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.选择要素ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.axTOCControl1 = new ESRI.ArcGIS.Controls.AxTOCControl();
+            this.axMapControl1 = new ESRI.ArcGIS.Controls.AxMapControl();
+            this.缩放至选择ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.清除选择ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axTOCControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.axMapControl1)).BeginInit();
-            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -67,7 +72,8 @@ namespace _201518100120
             this.地图浏览ToolStripMenuItem,
             this.地图文档保存ToolStripMenuItem,
             this.书签ToolStripMenuItem,
-            this.量测ToolStripMenuItem});
+            this.量测ToolStripMenuItem,
+            this.要素选择操作ToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(762, 25);
@@ -217,7 +223,8 @@ namespace _201518100120
             // 量测ToolStripMenuItem
             // 
             this.量测ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.距离量测ToolStripMenuItem});
+            this.距离量测ToolStripMenuItem,
+            this.面积量测ToolStripMenuItem});
             this.量测ToolStripMenuItem.Name = "量测ToolStripMenuItem";
             this.量测ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
             this.量测ToolStripMenuItem.Text = "量测";
@@ -225,9 +232,49 @@ namespace _201518100120
             // 距离量测ToolStripMenuItem
             // 
             this.距离量测ToolStripMenuItem.Name = "距离量测ToolStripMenuItem";
-            this.距离量测ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.距离量测ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.距离量测ToolStripMenuItem.Text = "距离量测";
             this.距离量测ToolStripMenuItem.Click += new System.EventHandler(this.距离量测ToolStripMenuItem_Click);
+            // 
+            // 面积量测ToolStripMenuItem
+            // 
+            this.面积量测ToolStripMenuItem.Name = "面积量测ToolStripMenuItem";
+            this.面积量测ToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.面积量测ToolStripMenuItem.Text = "面积量测";
+            this.面积量测ToolStripMenuItem.Click += new System.EventHandler(this.面积量测ToolStripMenuItem_Click);
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.barCoorTxt});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 461);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(762, 22);
+            this.statusStrip1.TabIndex = 3;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // barCoorTxt
+            // 
+            this.barCoorTxt.Name = "barCoorTxt";
+            this.barCoorTxt.Size = new System.Drawing.Size(131, 17);
+            this.barCoorTxt.Text = "toolStripStatusLabel1";
+            // 
+            // 要素选择操作ToolStripMenuItem
+            // 
+            this.要素选择操作ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.选择要素ToolStripMenuItem,
+            this.缩放至选择ToolStripMenuItem,
+            this.清除选择ToolStripMenuItem});
+            this.要素选择操作ToolStripMenuItem.Name = "要素选择操作ToolStripMenuItem";
+            this.要素选择操作ToolStripMenuItem.Size = new System.Drawing.Size(92, 21);
+            this.要素选择操作ToolStripMenuItem.Text = "要素选择操作";
+            // 
+            // 选择要素ToolStripMenuItem
+            // 
+            this.选择要素ToolStripMenuItem.Name = "选择要素ToolStripMenuItem";
+            this.选择要素ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.选择要素ToolStripMenuItem.Text = "选择要素";
+            this.选择要素ToolStripMenuItem.Click += new System.EventHandler(this.选择要素ToolStripMenuItem_Click);
             // 
             // axTOCControl1
             // 
@@ -248,21 +295,19 @@ namespace _201518100120
             this.axMapControl1.OnMouseMove += new ESRI.ArcGIS.Controls.IMapControlEvents2_Ax_OnMouseMoveEventHandler(this.axMapControl1_OnMouseMove);
             this.axMapControl1.OnDoubleClick += new ESRI.ArcGIS.Controls.IMapControlEvents2_Ax_OnDoubleClickEventHandler(this.axMapControl1_OnDoubleClick);
             // 
-            // statusStrip1
+            // 缩放至选择ToolStripMenuItem
             // 
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.barCoorTxt});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 461);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(762, 22);
-            this.statusStrip1.TabIndex = 3;
-            this.statusStrip1.Text = "statusStrip1";
+            this.缩放至选择ToolStripMenuItem.Name = "缩放至选择ToolStripMenuItem";
+            this.缩放至选择ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.缩放至选择ToolStripMenuItem.Text = "缩放至选择";
+            this.缩放至选择ToolStripMenuItem.Click += new System.EventHandler(this.缩放至选择ToolStripMenuItem_Click);
             // 
-            // barCoorTxt
+            // 清除选择ToolStripMenuItem
             // 
-            this.barCoorTxt.Name = "barCoorTxt";
-            this.barCoorTxt.Size = new System.Drawing.Size(131, 17);
-            this.barCoorTxt.Text = "toolStripStatusLabel1";
+            this.清除选择ToolStripMenuItem.Name = "清除选择ToolStripMenuItem";
+            this.清除选择ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.清除选择ToolStripMenuItem.Text = "清除选择";
+            this.清除选择ToolStripMenuItem.Click += new System.EventHandler(this.清除选择ToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -279,10 +324,10 @@ namespace _201518100120
             this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.axTOCControl1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.axMapControl1)).EndInit();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.axTOCControl1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.axMapControl1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -315,6 +360,11 @@ namespace _201518100120
         private System.Windows.Forms.ToolStripStatusLabel barCoorTxt;
         private System.Windows.Forms.ToolStripMenuItem 量测ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 距离量测ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 面积量测ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 要素选择操作ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 选择要素ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 缩放至选择ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 清除选择ToolStripMenuItem;
     }
 }
 

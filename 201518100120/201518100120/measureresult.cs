@@ -12,12 +12,8 @@ namespace _201518100120
     public partial class measureresult : Form
     {
         public delegate void FormClosedEventHandler();
-        public event FormClosedEventHandler frmClose = null;//定义一个空的委托事件
-        private void FormMeasureResult_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            if (frmClose != null)//判断委托是否为空
-                frmClose();
-        }
+        public event FormClosedEventHandler frmClosed=null;//定义一个空的委托事件
+        
         //窗口关闭时引发委托事件。
         public measureresult()
         {
@@ -28,6 +24,13 @@ namespace _201518100120
 
         private void measureresult_Load(object sender, EventArgs e)
         {
+
+        }
+
+        private void measureresult_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (frmClosed != null)//判断委托是否为空
+                frmClosed();
 
         }
     }

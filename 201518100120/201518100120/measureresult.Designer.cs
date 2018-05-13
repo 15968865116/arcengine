@@ -59,6 +59,7 @@
             this.Controls.Add(this.label1);
             this.Name = "measureresult";
             this.Text = "measureresult";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.measureresult_FormClosed);
             this.Load += new System.EventHandler(this.measureresult_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

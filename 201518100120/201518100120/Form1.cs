@@ -28,12 +28,32 @@ namespace _201518100120
         private bool bMeasureLength;//是否开始长度量算
         private INewLineFeedback pNewLineFeedback;//追踪线对象
         private INewPolygonFeedback pNewPolygonFeedback;//追踪面对象
-        private IPoint pPointPt=new PointClass();//鼠标点击点
-        private IPoint pMovePt=new PointClass();//鼠标移动当前点 
+        private IPoint pPointPt;//鼠标点击点
+        private IPoint pMovePt;//鼠标移动当前点 
         private double dToltaLength;//量测总长度
         private double dSegmentLength;//片段距离
         private IPointCollection pAreaPointCollection =new MultipointClass();//面积量算时画的点进行存储
         string mousedownname = "";//鼠标按下操作的全局变量
+        private object missing = Type.Missing;
+
+        private void frmMeasureResult_frmClosed()//委托函数所调用的事件，主要用于结束量算和清空线和面对象
+        {
+            if (pNewLineFeedback != null)//判断面对象是否为空不为空则清空
+            {
+                pNewLineFeedback.Stop();
+                pNewLineFeedback = null;
+            }
+            if (pNewPolygonFeedback != null)//清空面对象
+            {
+                pNewPolygonFeedback.Stop();
+                pNewPolygonFeedback = null;
+                pAreaPointCollection.RemovePoints(0, pAreaPointCollection.PointCount);//清空点集中所有点
+            }
+            axMapControl1.ActiveView.PartialRefresh(esriViewDrawPhase.esriViewForeground, null, null);//清空量算画的线、面对象
+            axMapControl1.MousePointer = esriControlsMousePointer.esriPointerDefault;//结束量算功能
+            mousedownname = "";
+
+        }
 
 
         private void 打开地图文档ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -137,18 +157,21 @@ namespace _201518100120
         {
             IActiveView pActiveview = axMapControl1.ActiveView;
             IEnvelope envelope = new EnvelopeClass();
-                   
+            pPointPt = axMapControl1.ActiveView.ScreenDisplay.DisplayTransformation.ToMapPoint(e.x,e.y);   
 
             switch(mousedownname)
             { 
-                case "zoomin":
+
+                case "":
+                    break;
+                case "zoomin"://拉框放大
                     envelope = axMapControl1.TrackRectangle();//获取拉框信息
                     if (envelope == null || envelope.IsEmpty || envelope.Height == 0 || envelope.Width == 0)//判断是否为空框
                         return;
                     pActiveview.Extent = envelope;
                     pActiveview.Refresh();
                     break;
-                case "zoomout":
+                case "zoomout"://拉框缩小
                     envelope = axMapControl1.TrackRectangle();
                     if (envelope == null || envelope.IsEmpty || envelope.Height == 0 || envelope.Width == 0)
                         return;
@@ -162,11 +185,11 @@ namespace _201518100120
                     pActiveview.Extent = envelope;
                     pActiveview.Refresh();
                     break;
-                case "manyou":
+                case "manyou"://漫游
                     axMapControl1.Pan();
                     break;
-                case "MeasureLength":
-                    pPointPt.PutCoords(e.mapX, e.mapY);
+                case "MeasureLength"://长度量测
+                    
                     if (pNewLineFeedback == null)
                     {
                         pNewLineFeedback = new NewLineFeedback { Display = pActiveview.ScreenDisplay };//实例化追踪线对象
@@ -176,9 +199,43 @@ namespace _201518100120
                     else//如果追踪线对象不为空，则添加当前鼠标点
                     {
                         pNewLineFeedback.AddPoint(pPointPt);
+                        
                     }
                     if (dSegmentLength != 0)
                         dToltaLength = dToltaLength + dSegmentLength;
+                    break;
+                case "MeasureArea"://面积量测
+                    
+                    if (pNewPolygonFeedback == null)
+                    {
+                        pNewPolygonFeedback = new NewPolygonFeedback { Display = pActiveview.ScreenDisplay };//实例化面对象
+                        pAreaPointCollection.RemovePoints(0, pAreaPointCollection.PointCount);//清空点集
+                        pNewPolygonFeedback.Start(pPointPt);//开始绘制多边形
+                        pAreaPointCollection.AddPoint(pPointPt, ref missing, ref missing);
+                    }
+                    else
+                    {
+                        pNewPolygonFeedback.AddPoint(pPointPt);
+                        pAreaPointCollection.AddPoint(pPointPt, ref missing, ref missing);
+                    }
+                
+                    break;
+                case "selectfeature"://要素选择
+                    IEnvelope pEnv = axMapControl1.TrackRectangle();
+                    IGeometry pGeo = pEnv;
+                    if (pEnv.IsEmpty)//若为空则在鼠标当前点进行选择部分区域作为框
+                    {
+                        tagRECT r;
+                        r.left = e.x - 5;
+                        r.top = e.y - 5;
+                        r.right = e.x + 5;
+                        r.bottom = e.y + 5;
+                        pActiveview.ScreenDisplay.DisplayTransformation.TransformRect(pEnv, ref r, 4);
+                        pEnv.SpatialReference = pActiveview.FocusMap.SpatialReference;
+                    }
+                    pGeo = pEnv;
+                    axMapControl1.Map.SelectByShape(pGeo, null, false);
+                    axMapControl1.Refresh(esriViewDrawPhase.esriViewGeoSelection,null,null);
                     break;
 
             }
@@ -366,10 +423,10 @@ namespace _201518100120
         {
             sMapUnit = GetMapUnit(axMapControl1.Map.MapUnits);
             barCoorTxt.Text = string.Format("当前坐标：X{0:#.###}  Y={1:#.###}{2}",e.mapX,e.mapY,sMapUnit);
-            pMovePt.PutCoords(e.mapX, e.mapY);//获取移动点
+            pMovePt = axMapControl1.ActiveView.ScreenDisplay.DisplayTransformation.ToMapPoint(e.x, e.y);  //获取移动点
             switch (mousedownname)
             {
-                case "MeasureLength":
+                case "MeasureLength"://距离量测
                     if (pNewLineFeedback != null)
                         pNewLineFeedback.MoveTo(pMovePt);//移动至当前
                     if (pPointPt != null && pNewLineFeedback != null)
@@ -383,29 +440,51 @@ namespace _201518100120
                             frmMeasureresult.label2.Text=String.Format("当前长度线段为：{0:.###}{1};\r\n总长度为：{2:.###}{1}",dSegmentLength,sMapUnit,dToltaLength);
                             dToltaLength = dToltaLength - dSegmentLength;//鼠标移动到新点重新开始计算
                         }
+                        
                     }
 
+                    break;
+                case "MeasureArea"://面积量测
+                    if (pNewPolygonFeedback != null)
+                        pNewPolygonFeedback.MoveTo(pMovePt);
+                    IPointCollection pPointCol=new Polygon();//实例化一个新的点集对象
+                    IPolygon pPolygon = new PolygonClass();//实例化一个面几何对象
+                    
+                    
+                    for (int i = 0; i <= pAreaPointCollection.PointCount - 1; i++)
+                    {
+                        
+                        pPointCol.AddPoint(pAreaPointCollection.get_Point(i), ref missing, ref missing);//将全局变量中已经确定的点集赋给pPointCol这个点集对象
+                    }
+                        
+                    pPointCol.AddPoint(pMovePt, ref missing, ref missing);//将当前的移动点赋给pPointCol这个点集对象
+
+                    if (pPointCol.PointCount < 3)
+                    {
+                        
+                        return;//小于三个点无法形成面，不执行以下语句
+                    }
+                    pPolygon = pPointCol as IPolygon;//将点集合形成一个面对象
+                    if ((pPolygon != null))
+                    {
+                        pPolygon.Close();
+                        IGeometry pGeo = pPolygon;
+                        ITopologicalOperator pTopo = pGeo as ITopologicalOperator;
+                        pTopo.Simplify();
+                        pGeo.Project(axMapControl1.Map.SpatialReference);
+                        IArea pArea = pGeo as IArea;
+                        frmMeasureresult.label2.Text = String.Format("总面积为：{0:.####}平方{1};\r\n总长度为：{2:.#####}{1}",pArea.Area,sMapUnit,pPolygon.Length);
+                        
+                        
+                        
+                        
+                    }
+                    
                     break;
             }
         }
 
-        private void frmMeasureResult_frmClosed()//委托函数所调用的事件，主要用于结束量算和清空线和面对象
-        {
-            if (pNewLineFeedback != null)//判断面对象是否为空不为空则清空
-            {
-                pNewLineFeedback.Stop();
-                pNewLineFeedback = null;
-            }
-            if (pNewPolygonFeedback != null)//清空面对象
-            {
-                pNewPolygonFeedback.Stop();
-                pNewPolygonFeedback = null;
-                pAreaPointCollection.RemovePoints(0,pAreaPointCollection.PointCount);//清空点集中所有点
-            }
-            axMapControl1.ActiveView.PartialRefresh(esriViewDrawPhase.esriViewForeground,null,null);//清空量算画的线、面对象
-            axMapControl1.MousePointer = esriControlsMousePointer.esriPointerDefault;//结束量算功能
- 
-        }
+        
 
         private void 距离量测ToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -415,7 +494,7 @@ namespace _201518100120
             if (frmMeasureresult == null || frmMeasureresult.IsDisposed)//窗口不存在则新建一个窗口
             {
                 frmMeasureresult = new measureresult();
-                frmMeasureresult.frmClose += frmMeasureResult_frmClosed;//委托事件就是后面的函数
+                frmMeasureresult.frmClosed+=frmMeasureResult_frmClosed;//委托事件就是后面的函数
                 frmMeasureresult.Show();
             }
             else
@@ -443,8 +522,74 @@ namespace _201518100120
                     }
                     dToltaLength = 0;
                     dSegmentLength = 0;
+                    
+                    break;
+                case "MeasureArea":
+                    if (pNewPolygonFeedback != null)
+                    {
+                        pNewPolygonFeedback.Stop();
+                        pNewPolygonFeedback = null;
+                        axMapControl1.ActiveView.PartialRefresh(esriViewDrawPhase.esriViewForeground, null, null);//清空面对象
+
+                    }
+                    pAreaPointCollection.RemovePoints(0, pAreaPointCollection.PointCount);//清空点集中所有点
+                    
+
                     break;
             }
+        }
+
+        private void 面积量测ToolStripMenuItem_Click(object sender, EventArgs e)//初始化相关变量，弹出量测窗体
+        {
+            axMapControl1.CurrentTool = null;
+            mousedownname = "MeasureArea";
+            axMapControl1.MousePointer = esriControlsMousePointer.esriPointerCrosshair;
+            if (frmMeasureresult == null || frmMeasureresult.IsDisposed)
+            {
+                frmMeasureresult = new measureresult();
+                frmMeasureresult.frmClosed += frmMeasureResult_frmClosed;
+                frmMeasureresult.Show();
+            }
+            else
+                frmMeasureresult.Activate();
+        }
+
+        private void 选择要素ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            mousedownname = "selectfeature";
+        }
+
+        private void 缩放至选择ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int nSelection = axMapControl1.Map.SelectionCount;//统计选择的要素的个数
+            if (nSelection == 0)
+            {
+                MessageBox.Show("请先选择要素！", "提示");
+            }
+            else
+            {
+                ISelection selection = axMapControl1.Map.FeatureSelection;//选择的要素
+                IEnumFeature enumfeature = (IEnumFeature)selection;//
+                enumfeature.Reset();
+                IEnvelope pEnvelop = new EnvelopeClass();
+                IFeature pFeature = enumfeature.Next();
+                while (pFeature != null)
+                {
+                    pEnvelop.Union(pFeature.Extent);
+                    pFeature = enumfeature.Next();
+                }
+                pEnvelop.Expand(1.1, 1.1, true);
+                axMapControl1.ActiveView.Extent = pEnvelop;
+                axMapControl1.ActiveView.Refresh();
+            }
+
+        }
+
+        private void 清除选择ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            IActiveView pActiveview = axMapControl1.ActiveView;
+            pActiveview.FocusMap.ClearSelection();
+            pActiveview.PartialRefresh(esriViewDrawPhase.esriViewGeoSelection,null,pActiveview.Extent);
         }
 
 
