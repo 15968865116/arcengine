@@ -35,6 +35,13 @@ namespace _201518100120
         private IPointCollection pAreaPointCollection =new MultipointClass();//面积量算时画的点进行存储
         string mousedownname = "";//鼠标按下操作的全局变量
         private object missing = Type.Missing;
+       //TOCControl右键菜单所用到的变量
+        IFeatureLayer pTocFeatureLayer = null;//点击的要素图层
+        public attribute frmAttribute = null;//新建一个属性表
+        private mapexport frmExpMap=null;//新建一个输出窗口
+
+
+
 
         private void frmMeasureResult_frmClosed()//委托函数所调用的事件，主要用于结束量算和清空线和面对象
         {
@@ -236,6 +243,19 @@ namespace _201518100120
                     pGeo = pEnv;
                     axMapControl1.Map.SelectByShape(pGeo, null, false);
                     axMapControl1.Refresh(esriViewDrawPhase.esriViewGeoSelection,null,null);
+                    break;
+                case "ExportRegion":
+                    pActiveview.GraphicsContainer.DeleteAllElements();
+                    pActiveview.Refresh();
+                    IPolygon pPolygon = ExportMap.DrawPolygon(axMapControl1);
+                    if (pPolygon == null) return;
+                    ExportMap.AddElement(pPolygon, pActiveview);
+                    if (frmExpMap == null || frmExpMap.IsDisposed)
+                        frmExpMap = new mapexport(axMapControl1);
+                    frmExpMap.isRegion = true;
+                    frmExpMap.geometry = pPolygon;
+                    frmExpMap.Show();
+                    frmExpMap.Activate();
                     break;
 
             }
@@ -590,6 +610,92 @@ namespace _201518100120
             IActiveView pActiveview = axMapControl1.ActiveView;
             pActiveview.FocusMap.ClearSelection();
             pActiveview.PartialRefresh(esriViewDrawPhase.esriViewGeoSelection,null,pActiveview.Extent);
+        }
+
+        private void axTOCControl1_OnMouseDown(object sender, ITOCControlEvents_OnMouseDownEvent e)
+        {
+            if (e.button == 2)//右键，1为按左键
+            {
+                esriTOCControlItem pItem = esriTOCControlItem.esriTOCControlItemNone;
+                IBasicMap pMap = null;
+                object unk = null;
+                object data = null;
+                ILayer pLayer = null;
+                axTOCControl1.HitTest(e.x,e.y,ref pItem,ref pMap,ref pLayer,ref unk,ref data);
+                pTocFeatureLayer = pLayer as IFeatureLayer;
+                if(pItem==esriTOCControlItem.esriTOCControlItemLayer&&pTocFeatureLayer!=null)
+                {
+                    图层可选ToolStripMenuItem.Enabled = !pTocFeatureLayer.Selectable;//设置当前为图层为可选，所以此按钮灰色
+                    图层不可选ToolStripMenuItem.Enabled = pTocFeatureLayer.Selectable;//图层不可选按钮亮着可以选
+                    contextMenuStrip1.Show(MousePosition);
+                }
+            }
+        }
+
+        private void 属性表ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            if (frmAttribute != null && !frmAttribute.IsDisposed) return;
+            frmAttribute = new attribute(pTocFeatureLayer);//pTocFeatureLayer在axTOCControl1_OnMouseDown已经被复制为当前选择的图层
+            frmAttribute.ShowDialog();
+            frmAttribute = null;
+        }
+
+        private void 缩放到图层ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (pTocFeatureLayer == null) return;
+            axMapControl1.ActiveView.Extent = pTocFeatureLayer.AreaOfInterest;//视图放大到选中的图层
+            axMapControl1.ActiveView.PartialRefresh(esriViewDrawPhase.esriViewGeography,null,null);
+        }
+
+        private void 移除图层ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (pTocFeatureLayer == null) return;
+                DialogResult result = MessageBox.Show("是否删除["+pTocFeatureLayer.Name+"]图层","提示",MessageBoxButtons.OKCancel,MessageBoxIcon.Information);
+                if (result == DialogResult.OK)
+                {
+                    axMapControl1.Map.DeleteLayer(pTocFeatureLayer);
+                }
+                axMapControl1.ActiveView.Refresh();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void 图层可选ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            pTocFeatureLayer.Selectable = true;
+            图层可选ToolStripMenuItem.Enabled = !图层可选ToolStripMenuItem.Enabled;
+
+        }
+
+        private void 图层不可选ToolStripMenuItem_Click(object sender, EventArgs e)//使得选择要素过程中无法选择此图层要素
+        {
+            pTocFeatureLayer.Selectable = false;
+            图层不可选ToolStripMenuItem.Enabled =! 图层不可选ToolStripMenuItem.Enabled;
+        }
+
+        private void 全域导出ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(frmExpMap==null||frmExpMap.IsDisposed)
+            {
+                frmExpMap = new mapexport(axMapControl1);
+            }
+            frmExpMap.isRegion = false;//表示为全域导出
+            frmExpMap.geometry = axMapControl1.ActiveView.Extent;
+            frmExpMap.Show();
+            frmExpMap.Activate();
+        }
+
+        private void 区域导出ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            axMapControl1.CurrentTool = null;
+            axMapControl1.MousePointer = esriControlsMousePointer.esriPointerCrosshair;
+            mousedownname = "ExportRegion";
         }
 
 

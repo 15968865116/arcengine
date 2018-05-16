@@ -59,7 +59,7 @@
     </Reference>
     <Reference Include="ESRI.ArcGIS.AxControls, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL" />
     <Reference Include="ESRI.ArcGIS.Carto, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="ESRI.ArcGIS.Controls, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -73,8 +73,8 @@
       <SpecificVersion>False</SpecificVersion>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
-    <Reference Include="ESRI.ArcGIS.Display, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+    <Reference Include="ESRI.ArcGIS.Display, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="ESRI.ArcGIS.EngineCore, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -100,7 +100,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="ESRI.ArcGIS.Output, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="ESRI.ArcGIS.System, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -127,12 +127,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="attribute.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="attribute.Designer.cs">
+      <DependentUpon>attribute.cs</DependentUpon>
+    </Compile>
     <Compile Include="bookmark.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="bookmark.Designer.cs">
       <DependentUpon>bookmark.cs</DependentUpon>
     </Compile>
+    <Compile Include="ExportMap.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -144,6 +151,12 @@
     </Compile>
     <Compile Include="managebookmark.Designer.cs">
       <DependentUpon>managebookmark.cs</DependentUpon>
+    </Compile>
+    <Compile Include="mapexport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="mapexport.Designer.cs">
+      <DependentUpon>mapexport.cs</DependentUpon>
     </Compile>
     <Compile Include="measureresult.cs">
       <SubType>Form</SubType>
@@ -157,6 +170,9 @@
     <Compile Include="LicenseInitializer.Designer.cs">
       <DependentUpon>LicenseInitializer.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="attribute.resx">
+      <DependentUpon>attribute.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="bookmark.resx">
       <DependentUpon>bookmark.cs</DependentUpon>
     </EmbeddedResource>
@@ -165,6 +181,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="managebookmark.resx">
       <DependentUpon>managebookmark.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="mapexport.resx">
+      <DependentUpon>mapexport.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="measureresult.resx">
       <DependentUpon>measureresult.cs</DependentUpon>

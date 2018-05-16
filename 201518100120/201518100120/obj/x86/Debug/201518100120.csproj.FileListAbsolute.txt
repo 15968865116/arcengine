@@ -37,3 +37,13 @@ D:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.managebookmar
 D:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.Properties.Resources.resources
 D:\arcengine\201518100120\201518100120\obj\x86\Debug\201518100120.csproj.GenerateResource.Cache
 D:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.measureresult.resources
+E:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.measureresult.resources
+E:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.attribute.resources
+E:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.mapexport.resources
+I:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.attribute.resources
+I:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.bookmark.resources
+I:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.managebookmark.resources
+I:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.mapexport.resources
+I:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.measureresult.resources
+D:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.attribute.resources
+D:\arcengine\201518100120\201518100120\obj\x86\Debug\_201518100120.mapexport.resources
