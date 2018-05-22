@@ -13,6 +13,7 @@ using ESRI.ArcGIS.DataSourcesRaster;
 using ESRI.ArcGIS.Display;
 using ESRI.ArcGIS.Geodatabase;
 using ESRI.ArcGIS.esriSystem;
+using MapOperation.ThematicMaps;
 
 namespace _201518100120
 {
@@ -23,9 +24,7 @@ namespace _201518100120
             InitializeComponent();
         }
         //量测全局变量
-        private measureresult frmMeasureresult;//量算结果窗体
-        private bool bMeasureArea;//是否开始面积量算功能
-        private bool bMeasureLength;//是否开始长度量算
+        private measureresult frmMeasureresult;//量算结果窗体       
         private INewLineFeedback pNewLineFeedback;//追踪线对象
         private INewPolygonFeedback pNewPolygonFeedback;//追踪面对象
         private IPoint pPointPt;//鼠标点击点
@@ -39,6 +38,10 @@ namespace _201518100120
         IFeatureLayer pTocFeatureLayer = null;//点击的要素图层
         public attribute frmAttribute = null;//新建一个属性表
         private mapexport frmExpMap=null;//新建一个输出窗口
+        //鹰眼全局变量
+        private bool bCanDrag;//鹰眼地图上的矩形可移动的标志
+        private IPoint pMoveRectPoint;//记录在移动鹰眼地图上的矩形框时的鼠标的位置
+        private IEnvelope pEnv;//记录数据视图的extent
 
 
 
@@ -698,7 +701,378 @@ namespace _201518100120
             mousedownname = "ExportRegion";
         }
 
+        private void axMapControl1_OnMapReplaced(object sender, IMapControlEvents2_OnMapReplacedEvent e)
+        {
+            SynchronizeEagleEye();//一个函数，下面定义
+        }
+        private void SynchronizeEagleEye()//加载鹰眼视图
+        {
+            if (EagleEyemapcontrol.LayerCount > 0)//清除原有图层
+            {
+                EagleEyemapcontrol.ClearLayers();
+            }
+            EagleEyemapcontrol.SpatialReference = axMapControl1.SpatialReference;//鹰眼视图坐标系和主地图坐标系相同
+            for (int i = axMapControl1.LayerCount - 1; i >= 0; i--)
+            {
+                ILayer player = axMapControl1.get_Layer(i);//获取第i个视图
+                if (player is IGroupLayer || player is ICompositeLayer)//判断此视图是否内置还有图层
+                {
+                    ICompositeLayer pcompositelayer = (ICompositeLayer)player;//强制转换
+                    for (int j = pcompositelayer.Count - 1; j >= 0; j--)
+                    {
+                        ILayer psublayer = pcompositelayer.get_Layer(j);//获取此视图中第i个图层
+                        IFeatureLayer pfeaturelayer = psublayer as IFeatureLayer;//获得此图层作为要素图层
+                        if (pfeaturelayer == null) continue;//此图层为空则返回进行下一个图层操作
+                        if (pfeaturelayer.FeatureClass.ShapeType != esriGeometryType.esriGeometryPoint && pfeaturelayer.FeatureClass.ShapeType != esriGeometryType.esriGeometryMultipoint)
+                            EagleEyemapcontrol.AddLayer(player);
+                    }
+                }
+                else
+                {
+                    IFeatureLayer pfeaturelayer1 = new FeatureLayer();
+                    pfeaturelayer1 = player as IFeatureLayer;
+                    if (pfeaturelayer1 == null) continue;
+                    if (pfeaturelayer1 != null)
+                    {
+                        if (pfeaturelayer1.FeatureClass == null)
+                            return;
+                        else
+                        {
+                            if (pfeaturelayer1.FeatureClass.ShapeType != esriGeometryType.esriGeometryPoint && pfeaturelayer1.FeatureClass.ShapeType != esriGeometryType.esriGeometryMultipoint)
+                                EagleEyemapcontrol.AddLayer(player);
+                        }
+                            
+                    }
+                }
+                EagleEyemapcontrol.Extent = axMapControl1.FullExtent;
+                pEnv = axMapControl1.Extent;
+                DrawRectangle(pEnv);//定义一个函数，在鹰眼视图上画矩形框
+                EagleEyemapcontrol.Refresh();
 
+            }
+
+        }
+        private void DrawRectangle(IEnvelope penvelope)
+        {
+            //先清除鹰眼中之前的矩形框
+            IGraphicsContainer pGraphicscontainer = EagleEyemapcontrol.Map as IGraphicsContainer;
+            if (pGraphicscontainer == null) return;
+            IActiveView pActiveView = pGraphicscontainer as IActiveView;
+            pGraphicscontainer.DeleteAllElements();
+            //得到当前视图范围
+            IRectangleElement pReactangleElement = new RectangleElementClass();
+            IElement pElement = pReactangleElement as IElement;
+            pElement.Geometry = penvelope;
+            //设置红色透明框
+            ILineSymbol poutline = new SimpleLineSymbolClass
+            {
+                Width = 2,
+                Color = new RgbColorClass { Transparency = 255, Red = 255 }
+
+            };
+            IFillSymbol pFillSymbol = new SimpleFillSymbolClass
+            {
+                Color = new RgbColorClass { Transparency = 0 },
+                Outline = poutline
+            };
+            //添加矩形框
+            IFillShapeElement pfillshapeelement = pElement as IFillShapeElement;
+            pfillshapeelement.Symbol = pFillSymbol;//样式
+            pGraphicscontainer.AddElement((IElement)pfillshapeelement,0);
+            pActiveView.PartialRefresh(esriViewDrawPhase.esriViewGraphics, null, null);//刷新
+
+        }
+
+        private void axMapControl1_OnExtentUpdated(object sender, IMapControlEvents2_OnExtentUpdatedEvent e)
+        {
+            pEnv = (IEnvelope)e.newEnvelope;
+            DrawRectangle(pEnv);
+        }
+
+        private void EagleEyemapcontrol_OnMouseDown(object sender, IMapControlEvents2_OnMouseDownEvent e)
+        {
+            if (EagleEyemapcontrol.Map.LayerCount <= 0) return;
+            if (e.button == 1) //单击左键移动矩形框
+            {
+                if (e.mapX > pEnv.XMin && e.mapY > pEnv.YMin && e.mapX < pEnv.XMax && e.mapY < pEnv.YMax)
+                    bCanDrag = true;
+                pMoveRectPoint = new PointClass();
+                pMoveRectPoint.PutCoords(e.mapX, e.mapY);
+            }
+            else if (e.button == 2)//单击右键绘制矩形框
+            {
+                IEnvelope penvelope = EagleEyemapcontrol.TrackRectangle();
+                IPoint ptemppoint = new PointClass();
+                ptemppoint.PutCoords(penvelope.XMin + penvelope.Width / 2, penvelope.YMin + penvelope.Height / 2);
+                axMapControl1.Extent = penvelope;
+                axMapControl1.CenterAt(ptemppoint);//做一个中心调整
+            }
+        }
+
+        private void EagleEyemapcontrol_OnMouseMove(object sender, IMapControlEvents2_OnMouseMoveEvent e)
+        {
+            if (pEnv==null)
+                return;
+            else if (e.mapX > pEnv.XMin && e.mapY > pEnv.YMin && e.mapX < pEnv.XMax && e.mapY < pEnv.YMax)
+            {
+                EagleEyemapcontrol.MousePointer = esriControlsMousePointer.esriPointerHand;//鼠标移动到框内，鼠标换成小手，表示可以移动
+                if (e.button == 2)//在内部按下鼠标右击，将鼠标演示设置为默认样式
+                    EagleEyemapcontrol.MousePointer = esriControlsMousePointer.esriPointerDefault;
+            }
+            else
+                EagleEyemapcontrol.MousePointer = esriControlsMousePointer.esriPointerDefault;//在其他位置将鼠标设为默认的样式
+            if (!bCanDrag) return;
+            //记录鼠标移动的距离
+            double dx = e.mapX - pMoveRectPoint.X;
+            double dy = e.mapY - pMoveRectPoint.Y;
+            pEnv.Offset(dx, dy);//根据偏移量修改pEnv的位置
+            pMoveRectPoint.PutCoords(e.mapX,e.mapX);
+            DrawRectangle(pEnv);
+            axMapControl1.Extent = pEnv;
+            
+        }
+
+        private void EagleEyemapcontrol_OnMouseUp(object sender, IMapControlEvents2_OnMouseUpEvent e)
+        {
+            if (e.button != 1 || pMoveRectPoint == null) return;
+            if (e.mapX == pMoveRectPoint.X && e.mapY == pMoveRectPoint.Y)
+                axMapControl1.CenterAt(pMoveRectPoint);
+            bCanDrag = false;
+        }
+
+        private void axMapControl1_OnAfterScreenDraw(object sender, IMapControlEvents2_OnAfterScreenDrawEvent e)
+        {
+            IActiveView pActiveview = (IActiveView)axPageLayoutControl1.ActiveView.FocusMap;
+            IDisplayTransformation displayTransformation = pActiveview.ScreenDisplay.DisplayTransformation;
+            displayTransformation.VisibleBounds = axMapControl1.Extent;
+            axPageLayoutControl1.ActiveView.Refresh();
+            CopyToPageLayout();//拷贝到布局视图方法
+        }
+        private void CopyToPageLayout()
+        {
+            IObjectCopy pObjectCopy = new ObjectCopyClass();
+            object copyFromMap = axMapControl1.Map;
+            object copiedmap = pObjectCopy.Copy(copyFromMap);//复制地图到copiedmap
+            object copytomap = axPageLayoutControl1.ActiveView.FocusMap;
+            pObjectCopy.Overwrite(copiedmap, ref copytomap);//复制地图
+            axPageLayoutControl1.ActiveView.Refresh();
+        }
+
+        private void 属性查询ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            querybyattribute frmquerybyattri = new querybyattribute(axMapControl1.Map);
+            frmquerybyattri.ShowDialog();
+        }
+
+        private void 唯一值符号化ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            uniquevaluerender frmuniqueValueRen = new uniquevaluerender();
+            frmuniqueValueRen.UniqueValueRender += frmUnique_ValueRender;//委托函数，在后面定义
+            frmuniqueValueRen.Map = axMapControl1.Map;
+            frmuniqueValueRen.InitUI();//窗口初始化
+            frmuniqueValueRen.ShowDialog();
+
+        }
+        private void frmUnique_ValueRender(string sFeatClsName, string sFieldName)
+        {
+            
+            IFeatureLayer pFeatLyr = GetFeatLyrByName(axMapControl1.Map, sFeatClsName);
+            UniqueValueRenderer(pFeatLyr, sFieldName);
+        }
+        #region UniqueValueRenderer函数其实并不知道在干嘛
+        private void UniqueValueRenderer(IFeatureLayer pFeatLyr, string sFieldName)
+        {
+            IGeoFeatureLayer pGeoFeatureLayer = pFeatLyr as IGeoFeatureLayer;
+            ITable pTable = pFeatLyr as ITable;
+            IUniqueValueRenderer pUniqueValueRender = new UniqueValueRendererClass();
+            int intFieldNumber = pTable.FindField(sFieldName);
+            pUniqueValueRender.FieldCount = 1;//设置唯一值符号化的关键字段为一个
+            pUniqueValueRender.set_Field(0, sFieldName);//设置唯一值符号化的第一个关键字段
+            IRandomColorRamp pRandomcolorramp = new RandomColorRampClass();//随机颜色
+            pRandomcolorramp.StartHue = 0;
+            pRandomcolorramp.MinValue = 0;
+            pRandomcolorramp.MinSaturation = 15;
+            pRandomcolorramp.EndHue = 360;
+            pRandomcolorramp.MaxValue = 100;
+            pRandomcolorramp.MaxSaturation = 30;//到这儿为止
+            IQueryFilter pQueryFilter = new QueryFilterClass();
+            pRandomcolorramp.Size = pFeatLyr.FeatureClass.FeatureCount(pQueryFilter);//通过属性字段的值的个数来添加颜色个数
+            bool bSuccess;
+            pRandomcolorramp.CreateRamp(out bSuccess);
+            IEnumColors pEnumRamp = pRandomcolorramp.Colors;
+            //查询字段的值
+            pQueryFilter = new QueryFilterClass();
+            pQueryFilter.AddField(sFieldName);
+            ICursor pCursor = pTable.Search(pQueryFilter,true);//获取属性表中对应字段的值的游标
+            IRow pNextRow = pCursor.NextRow();//获取下一行，这边应是第一行
+            while(pNextRow!=null)//若不为空添加颜色并获取下一行循环到结束
+            {
+                IRowBuffer pnextrowBuffer = pNextRow;
+                object codeValue=pnextrowBuffer.Value[intFieldNumber];
+                IColor pnextuniquecolor = pEnumRamp.Next();
+                if (pnextuniquecolor==null){
+                    pEnumRamp.Reset();
+                    pnextuniquecolor = pEnumRamp.Next();
+
+                }
+                switch (pGeoFeatureLayer.FeatureClass.ShapeType)
+                {
+                    case esriGeometryType.esriGeometryPolygon:
+                        {
+                            IFillSymbol pFillSymbol = new SimpleFillSymbolClass();
+                            pFillSymbol.Color = pnextuniquecolor;
+                            pUniqueValueRender.AddValue(codeValue.ToString(), "", pFillSymbol as ISymbol);
+                            pNextRow = pCursor.NextRow();
+                            break;
+                        }
+                    case esriGeometryType.esriGeometryPolyline:
+                        {
+                            ILineSymbol plineSymbol = new SimpleLineSymbolClass();
+                            plineSymbol.Color = pnextuniquecolor;
+                            pUniqueValueRender.AddValue(codeValue.ToString(), "", plineSymbol as ISymbol);
+                            pNextRow = pCursor.NextRow();
+                            break;
+                        }
+                    case esriGeometryType.esriGeometryPoint:
+                        {
+                            IMarkerSymbol pMarkerSymbol = new SimpleMarkerSymbolClass();
+                            pMarkerSymbol.Color = pnextuniquecolor;
+                            pUniqueValueRender.AddValue(codeValue.ToString(), "", pMarkerSymbol as ISymbol);
+                            pNextRow = pCursor.NextRow();
+                            break;
+                        }
+                }
+            }
+            pGeoFeatureLayer.Renderer = pUniqueValueRender as IFeatureRenderer;
+            axMapControl1.Refresh();
+            axTOCControl1.Update();
+        }
+        #endregion
+        #region 图层名称获取图层
+        /// <summary>
+        /// 由图层名称获取图层
+        /// </summary>
+        /// <param name="pLayer"></param>
+        /// <param name="sFeatLyrName"></param>
+        /// <returns></returns>
+        public IFeatureLayer GetFeatLyrByName(IMap pLayer, string sFeatLyrName)
+        {
+            IMap pLyr = null;
+            IFeatureLayer pFeatureLyr = null;
+            IFeatureLayer pFeatLyr = null;
+            for (int i=0; i < pLayer.LayerCount; i++)
+            {
+                pFeatLyr=pLayer.get_Layer(i) as IFeatureLayer;
+                if (pFeatLyr.FeatureClass.AliasName == sFeatLyrName)
+                {
+                    pFeatureLyr = pFeatLyr;
+                    return pFeatureLyr;
+                }
+                else
+                    continue;
+            }
+            return pFeatureLyr;
+        }
+        #endregion
+
+        private void 分级色彩符号化ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            graduatecolors frmgra = new graduatecolors();
+            frmgra.Graduatedcolors +=frmgra_Graduatedcolors;
+            frmgra.Map = axMapControl1.Map;//获取_map
+            frmgra.InitUI();
+            frmgra.ShowDialog();
+        }
+
+        void frmgra_Graduatedcolors(string sFeatClsName, string sFieldName, int intnumclasses)
+        {
+            IFeatureLayer pfeature = GetFeatLyrByName(axMapControl1.Map,sFeatClsName);
+            GraduatedColors(pfeature, sFieldName, intnumclasses);
+            
+        }
+        public void GraduatedColors(IFeatureLayer pfeatLyr, string sFieldName, int numclasses)
+        {
+            IGeoFeatureLayer pGeoFeatureL = pfeatLyr as IGeoFeatureLayer;
+            object dataFrequency;
+            object dataValues;
+            bool ok;
+            int breakIndex;
+            ITable pTable = pGeoFeatureL.FeatureClass as ITable;//各个字段变成一个表
+            ITableHistogram pTableHistogram = new BasicTableHistogramClass();
+            IBasicHistogram pBasicHistogram = (IBasicHistogram)pTableHistogram;
+            pTableHistogram.Field = sFieldName;
+            pTableHistogram.Table = pTable;
+            pBasicHistogram.GetHistogram(out dataValues, out dataFrequency);//获取渲染值及其出现的频率
+            IClassifyGEN pClassify = new EqualIntervalClass();
+            pClassify.Classify(dataValues, dataFrequency, ref numclasses);//进行等级划分
+            double[] Classes = pClassify.ClassBreaks as double[];
+            int classescount = Classes.GetUpperBound(0);
+            IClassBreaksRenderer pClassBreaksRenderer = new ClassBreaksRendererClass();
+            pClassBreaksRenderer.Field = sFieldName;//分段字段
+            pClassBreaksRenderer.BreakCount = classescount;//设置分级数目
+            pClassBreaksRenderer.SortClassesAscending = true;//分机后的图例是否按升级顺序排列
+
+            //分级颜色带的开始颜色和结束颜色（即分级颜色在此范围内）
+            IHsvColor pFromColor = new HsvColorClass();//起始颜色
+            pFromColor.Hue = 0;//黄色
+            pFromColor.Saturation = 50;
+            pFromColor.Value = 96;
+            IHsvColor ptocolor = new HsvColorClass();//终止颜色
+            ptocolor.Hue = 80;//不知道什么颜色
+            ptocolor.Saturation = 100;
+            ptocolor.Value = 96;
+            
+
+            //产生颜色带对象
+            IAlgorithmicColorRamp pAlgorithmicColorRamp = new AlgorithmicColorRampClass();
+            pAlgorithmicColorRamp.Algorithm = esriColorRampAlgorithm.esriHSVAlgorithm;
+            pAlgorithmicColorRamp.FromColor = pFromColor;
+            pAlgorithmicColorRamp.ToColor = ptocolor;
+            pAlgorithmicColorRamp.Size = classescount;
+            pAlgorithmicColorRamp.CreateRamp(out ok);
+
+            //获得颜色
+            IEnumColors pEnumColors = pAlgorithmicColorRamp.Colors;
+            //symbol和break下标从0开始
+            for (breakIndex = 0; breakIndex <= classescount - 1; breakIndex++)
+            {
+                IColor pColor = pEnumColors.Next();
+                switch (pGeoFeatureL.FeatureClass.ShapeType)
+                {
+                    case esriGeometryType.esriGeometryPolygon: 
+                    {
+                        ISimpleFillSymbol pSimpleFills = new SimpleFillSymbolClass();
+                        pSimpleFills.Color = pColor;
+                        pSimpleFills.Style = esriSimpleFillStyle.esriSFSSolid;
+                        pClassBreaksRenderer.set_Symbol(breakIndex, (ISymbol)pSimpleFills);//设置填充符号
+                        pClassBreaksRenderer.set_Break(breakIndex, Classes[breakIndex + 1]);//设定每一分级的分级断点
+                        break;
+                    }
+                    case esriGeometryType.esriGeometryPolyline:
+                    {
+                        ISimpleLineSymbol pSimplelines = new SimpleLineSymbolClass();
+                        pSimplelines.Color = pColor;
+                        
+                        pClassBreaksRenderer.set_Symbol(breakIndex, (ISymbol)pSimplelines);//设置填充符号
+                        pClassBreaksRenderer.set_Break(breakIndex, Classes[breakIndex + 1]);//设定每一分级的分级断点
+                        break;
+                    }
+                    case esriGeometryType.esriGeometryPoint:
+                    {
+                        ISimpleMarkerSymbol pSimplemaker = new SimpleMarkerSymbolClass();
+                        pSimplemaker.Color = pColor;
+                        
+                        pClassBreaksRenderer.set_Symbol(breakIndex, (ISymbol)pSimplemaker);//设置填充符号
+                        pClassBreaksRenderer.set_Break(breakIndex, Classes[breakIndex + 1]);//设定每一分级的分级断点
+                        break;
+                    }
+                }
+            }
+            pGeoFeatureL.Renderer = (IFeatureRenderer)pClassBreaksRenderer;
+            axMapControl1.Refresh();
+            axTOCControl1.Update();
+
+        }
 
     }
 }
