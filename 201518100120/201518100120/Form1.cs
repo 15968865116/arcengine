@@ -14,6 +14,8 @@ using ESRI.ArcGIS.Display;
 using ESRI.ArcGIS.Geodatabase;
 using ESRI.ArcGIS.esriSystem;
 using MapOperation.ThematicMaps;
+using ESRI.ArcGIS.SystemUI;
+
 
 namespace _201518100120
 {
@@ -1071,6 +1073,84 @@ namespace _201518100120
             pGeoFeatureL.Renderer = (IFeatureRenderer)pClassBreaksRenderer;
             axMapControl1.Refresh();
             axTOCControl1.Update();
+
+        }
+
+        private void 缓冲区分析ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ICommand pCommand = new ToolBufferAnalysis();
+            pCommand.OnCreate(axMapControl1.Object);
+            axMapControl1.CurrentTool = pCommand as ITool;
+        }
+
+        private void 唯一值符号化ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            uniquevaluerender frmuniqueValueRen = new uniquevaluerender();
+            frmuniqueValueRen.UniqueValueRender += frmUnique_ValueRender;//委托函数，在后面定义
+            frmuniqueValueRen.Map = axMapControl1.Map;
+            frmuniqueValueRen.InitUI();//窗口初始化
+            frmuniqueValueRen.ShowDialog();
+        }
+
+        private void 分级色彩符号化ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            graduatecolors frmgra = new graduatecolors();
+            frmgra.Graduatedcolors += frmgra_Graduatedcolors;
+            frmgra.Map = axMapControl1.Map;//获取_map
+            frmgra.InitUI();
+            frmgra.ShowDialog();
+        }
+
+        private void 属性查询ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            querybyattribute frmquerybyattri = new querybyattribute(axMapControl1.Map);
+            frmquerybyattri.ShowDialog();
+        }
+
+        private void 表面分析ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (axMapControl1.LayerCount == 0) return;
+            surface frmsurface = new surface(ref axMapControl1);
+            frmsurface.ShowDialog();
+        }
+
+        private void 打开栅格数据ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openfiledialog = new OpenFileDialog();
+            openfiledialog.CheckFileExists = true;
+            openfiledialog.Title = @"打开栅格数据";
+            openfiledialog.Filter = @"tif文件(*.tif)|*.tif;|tiff文件(*.tiff)|*.tiff;|jpeg文件(*.jpeg)|*.jpeg;|jpg文件(*.jpg)|*.jpg;|png文件(*.png)|*.png;|bmp文件(*.bmp)|*.bmp;|img文件(*.img)|*.img";
+            openfiledialog.RestoreDirectory = true;
+            openfiledialog.ShowDialog();
+
+            string pFullPath = openfiledialog.FileName;
+            if (pFullPath == "") return;
+            int pIndext = pFullPath.LastIndexOf("\\");
+            string filePath = pFullPath.Substring(0, pIndext);
+            string filename = pFullPath.Substring(pIndext + 1);
+
+
+            IWorkspaceFactory pworkspacefacory = new RasterWorkspaceFactory();//引用Geodatabase + DataSourceRaster
+            IWorkspace ws = pworkspacefacory.OpenFromFile(filePath, 0);
+            IRasterWorkspace rws = ws as IRasterWorkspace;//强制转换
+            IRasterDataset rds = rws.OpenRasterDataset(filename);
+
+            //影像金字塔的判断和创建（可有可无。创建金字塔的目的是减少时间）
+            IRasterPyramid rp = rds as IRasterPyramid;
+            if (rp != null)
+            {
+                if (!(rp.Present))
+                {
+                    rp.Create();
+                }
+            }
+
+            //新建栅格图层
+            IRasterLayer rl = new RasterLayer();//引用Carto
+            rl.CreateFromRaster(rds.CreateDefaultRaster());
+            //加载显示
+            axMapControl1.AddLayer(rl, 0);
+            axMapControl1.ActiveView.Refresh();
 
         }
 

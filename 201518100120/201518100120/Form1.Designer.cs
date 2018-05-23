@@ -34,6 +34,7 @@ namespace _201518100120
             this.打开文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.打开地图文档ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.打开shapefile文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.打开栅格数据ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.地图浏览ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.放大ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.缩小ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -59,8 +60,13 @@ namespace _201518100120
             this.地图导出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.全域导出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.区域导出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.属性查询ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.唯一值符号化ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.矢量图层操作ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.缓冲区分析ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.唯一值符号化ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.分级色彩符号化ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.属性查询ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.栅格操作ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.表面分析ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.barCoorTxt = new System.Windows.Forms.ToolStripStatusLabel();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -76,7 +82,6 @@ namespace _201518100120
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.分级色彩符号化ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.contextMenuStrip1.SuspendLayout();
@@ -99,12 +104,11 @@ namespace _201518100120
             this.量测ToolStripMenuItem,
             this.要素选择操作ToolStripMenuItem,
             this.地图导出ToolStripMenuItem,
-            this.属性查询ToolStripMenuItem,
-            this.唯一值符号化ToolStripMenuItem,
-            this.分级色彩符号化ToolStripMenuItem});
+            this.矢量图层操作ToolStripMenuItem,
+            this.栅格操作ToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(817, 25);
+            this.menuStrip1.Size = new System.Drawing.Size(929, 25);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -112,7 +116,8 @@ namespace _201518100120
             // 
             this.打开文件ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.打开地图文档ToolStripMenuItem,
-            this.打开shapefile文件ToolStripMenuItem});
+            this.打开shapefile文件ToolStripMenuItem,
+            this.打开栅格数据ToolStripMenuItem});
             this.打开文件ToolStripMenuItem.Name = "打开文件ToolStripMenuItem";
             this.打开文件ToolStripMenuItem.Size = new System.Drawing.Size(68, 21);
             this.打开文件ToolStripMenuItem.Text = "打开文件";
@@ -130,6 +135,13 @@ namespace _201518100120
             this.打开shapefile文件ToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             this.打开shapefile文件ToolStripMenuItem.Text = "打开shapefile文件";
             this.打开shapefile文件ToolStripMenuItem.Click += new System.EventHandler(this.打开shapefile文件ToolStripMenuItem_Click);
+            // 
+            // 打开栅格数据ToolStripMenuItem
+            // 
+            this.打开栅格数据ToolStripMenuItem.Name = "打开栅格数据ToolStripMenuItem";
+            this.打开栅格数据ToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.打开栅格数据ToolStripMenuItem.Text = "打开栅格数据";
+            this.打开栅格数据ToolStripMenuItem.Click += new System.EventHandler(this.打开栅格数据ToolStripMenuItem_Click);
             // 
             // 地图浏览ToolStripMenuItem
             // 
@@ -325,27 +337,67 @@ namespace _201518100120
             this.区域导出ToolStripMenuItem.Text = "区域导出";
             this.区域导出ToolStripMenuItem.Click += new System.EventHandler(this.区域导出ToolStripMenuItem_Click);
             // 
-            // 属性查询ToolStripMenuItem
+            // 矢量图层操作ToolStripMenuItem
             // 
-            this.属性查询ToolStripMenuItem.Name = "属性查询ToolStripMenuItem";
-            this.属性查询ToolStripMenuItem.Size = new System.Drawing.Size(68, 21);
-            this.属性查询ToolStripMenuItem.Text = "属性查询";
-            this.属性查询ToolStripMenuItem.Click += new System.EventHandler(this.属性查询ToolStripMenuItem_Click);
+            this.矢量图层操作ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.缓冲区分析ToolStripMenuItem,
+            this.唯一值符号化ToolStripMenuItem1,
+            this.分级色彩符号化ToolStripMenuItem1,
+            this.属性查询ToolStripMenuItem1});
+            this.矢量图层操作ToolStripMenuItem.Name = "矢量图层操作ToolStripMenuItem";
+            this.矢量图层操作ToolStripMenuItem.Size = new System.Drawing.Size(92, 21);
+            this.矢量图层操作ToolStripMenuItem.Text = "矢量图层操作";
             // 
-            // 唯一值符号化ToolStripMenuItem
+            // 缓冲区分析ToolStripMenuItem
             // 
-            this.唯一值符号化ToolStripMenuItem.Name = "唯一值符号化ToolStripMenuItem";
-            this.唯一值符号化ToolStripMenuItem.Size = new System.Drawing.Size(92, 21);
-            this.唯一值符号化ToolStripMenuItem.Text = "唯一值符号化";
-            this.唯一值符号化ToolStripMenuItem.Click += new System.EventHandler(this.唯一值符号化ToolStripMenuItem_Click);
+            this.缓冲区分析ToolStripMenuItem.Name = "缓冲区分析ToolStripMenuItem";
+            this.缓冲区分析ToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.缓冲区分析ToolStripMenuItem.Text = "缓冲区分析";
+            this.缓冲区分析ToolStripMenuItem.Click += new System.EventHandler(this.缓冲区分析ToolStripMenuItem_Click);
+            // 
+            // 唯一值符号化ToolStripMenuItem1
+            // 
+            this.唯一值符号化ToolStripMenuItem1.Name = "唯一值符号化ToolStripMenuItem1";
+            this.唯一值符号化ToolStripMenuItem1.Size = new System.Drawing.Size(160, 22);
+            this.唯一值符号化ToolStripMenuItem1.Text = "唯一值符号化";
+            this.唯一值符号化ToolStripMenuItem1.Click += new System.EventHandler(this.唯一值符号化ToolStripMenuItem1_Click);
+            // 
+            // 分级色彩符号化ToolStripMenuItem1
+            // 
+            this.分级色彩符号化ToolStripMenuItem1.Name = "分级色彩符号化ToolStripMenuItem1";
+            this.分级色彩符号化ToolStripMenuItem1.Size = new System.Drawing.Size(160, 22);
+            this.分级色彩符号化ToolStripMenuItem1.Text = "分级色彩符号化";
+            this.分级色彩符号化ToolStripMenuItem1.Click += new System.EventHandler(this.分级色彩符号化ToolStripMenuItem1_Click);
+            // 
+            // 属性查询ToolStripMenuItem1
+            // 
+            this.属性查询ToolStripMenuItem1.Name = "属性查询ToolStripMenuItem1";
+            this.属性查询ToolStripMenuItem1.Size = new System.Drawing.Size(160, 22);
+            this.属性查询ToolStripMenuItem1.Text = "属性查询";
+            this.属性查询ToolStripMenuItem1.Click += new System.EventHandler(this.属性查询ToolStripMenuItem1_Click);
+            // 
+            // 栅格操作ToolStripMenuItem
+            // 
+            this.栅格操作ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.表面分析ToolStripMenuItem});
+            this.栅格操作ToolStripMenuItem.Name = "栅格操作ToolStripMenuItem";
+            this.栅格操作ToolStripMenuItem.Size = new System.Drawing.Size(68, 21);
+            this.栅格操作ToolStripMenuItem.Text = "栅格操作";
+            // 
+            // 表面分析ToolStripMenuItem
+            // 
+            this.表面分析ToolStripMenuItem.Name = "表面分析ToolStripMenuItem";
+            this.表面分析ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.表面分析ToolStripMenuItem.Text = "表面分析";
+            this.表面分析ToolStripMenuItem.Click += new System.EventHandler(this.表面分析ToolStripMenuItem_Click);
             // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.barCoorTxt});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 461);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 512);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(817, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(929, 22);
             this.statusStrip1.TabIndex = 3;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -403,7 +455,7 @@ namespace _201518100120
             // 
             // axMapControl1
             // 
-            this.axMapControl1.Location = new System.Drawing.Point(6, 3);
+            this.axMapControl1.Location = new System.Drawing.Point(3, 6);
             this.axMapControl1.Name = "axMapControl1";
             this.axMapControl1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axMapControl1.OcxState")));
             this.axMapControl1.Size = new System.Drawing.Size(534, 381);
@@ -417,7 +469,7 @@ namespace _201518100120
             // 
             // axTOCControl1
             // 
-            this.axTOCControl1.Location = new System.Drawing.Point(13, 42);
+            this.axTOCControl1.Location = new System.Drawing.Point(13, 71);
             this.axTOCControl1.Name = "axTOCControl1";
             this.axTOCControl1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axTOCControl1.OcxState")));
             this.axTOCControl1.Size = new System.Drawing.Size(219, 206);
@@ -426,7 +478,7 @@ namespace _201518100120
             // 
             // EagleEyemapcontrol
             // 
-            this.EagleEyemapcontrol.Location = new System.Drawing.Point(13, 254);
+            this.EagleEyemapcontrol.Location = new System.Drawing.Point(12, 283);
             this.EagleEyemapcontrol.Name = "EagleEyemapcontrol";
             this.EagleEyemapcontrol.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("EagleEyemapcontrol.OcxState")));
             this.EagleEyemapcontrol.Size = new System.Drawing.Size(219, 204);
@@ -448,7 +500,7 @@ namespace _201518100120
             this.tabControl1.Alignment = System.Windows.Forms.TabAlignment.Bottom;
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Location = new System.Drawing.Point(238, 42);
+            this.tabControl1.Location = new System.Drawing.Point(238, 71);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(551, 416);
@@ -476,23 +528,16 @@ namespace _201518100120
             this.tabPage2.Text = "布局视图";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // 分级色彩符号化ToolStripMenuItem
-            // 
-            this.分级色彩符号化ToolStripMenuItem.Name = "分级色彩符号化ToolStripMenuItem";
-            this.分级色彩符号化ToolStripMenuItem.Size = new System.Drawing.Size(104, 21);
-            this.分级色彩符号化ToolStripMenuItem.Text = "分级色彩符号化";
-            this.分级色彩符号化ToolStripMenuItem.Click += new System.EventHandler(this.分级色彩符号化ToolStripMenuItem_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(817, 483);
+            this.ClientSize = new System.Drawing.Size(929, 534);
             this.Controls.Add(this.tabControl1);
-            this.Controls.Add(this.EagleEyemapcontrol);
             this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.axTOCControl1);
+            this.Controls.Add(this.EagleEyemapcontrol);
             this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.axTOCControl1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "Form1";
@@ -557,12 +602,17 @@ namespace _201518100120
         private System.Windows.Forms.ToolStripMenuItem 区域导出ToolStripMenuItem;
         private ESRI.ArcGIS.Controls.AxMapControl EagleEyemapcontrol;
         private ESRI.ArcGIS.Controls.AxPageLayoutControl axPageLayoutControl1;
-        private System.Windows.Forms.ToolStripMenuItem 属性查询ToolStripMenuItem;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.ToolStripMenuItem 唯一值符号化ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 分级色彩符号化ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 矢量图层操作ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 缓冲区分析ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 唯一值符号化ToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem 分级色彩符号化ToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem 属性查询ToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem 栅格操作ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 表面分析ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 打开栅格数据ToolStripMenuItem;
     }
 }
 
